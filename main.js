@@ -21,8 +21,11 @@ export function createApp() {
 	}
 }
 // #endif
+
 import uView from '@/uni_modules/uview-ui'
 Vue.use(uView)
+
+// #ifndef MP-WEIXIN
 const AV = require('leancloud-storage');
 const {
 	Query,
@@ -31,5 +34,6 @@ const {
 AV.init({
 	appId: "zvCyWUCFP5gn8L8DeuMUph6x-gzGzoHsz",
 	appKey: "x4JFC5cdvO71mtJhyBGC2dkc",
-	serverURL: "http://flowerapi.mistletoe.top"
+	serverURL: "https://flowerapi.mistletoe.top"
 });
+// #endif
