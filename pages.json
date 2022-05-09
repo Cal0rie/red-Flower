@@ -9,7 +9,14 @@
 				"navigationBarTitleText": "小红花"
 			}
 		}
-	],
+	    ,{
+            "path" : "pages/wish/wish",
+            "style" : {
+                "navigationBarTitleText": "许个愿望吧"
+            }
+            
+        }
+    ],
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
 		"navigationBarTitleText": "小红花",

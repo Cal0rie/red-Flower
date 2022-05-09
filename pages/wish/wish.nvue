@@ -1,0 +1,186 @@
+<template>
+	<uni-list>
+	<view class="content">
+		<view class="text-area">
+			<text class="title">许个愿望吧！！</text>
+			<text class="title">你现在有{{title}}朵小红花</text>
+		</view>
+		<u-button @click='open' style='margin-top: 50rpx;' class='btn' shape='circle' type='primary'>许个愿</u-button>
+			<u-swipe-action style='margin-top: 20rpx;'>
+			        <u-swipe-action-item
+			          :options="options1"
+						v-for="(item, index) in wishes" :key='index'
+						@click=choose(index)
+			        >
+					
+			<uni-card class='card' :title="'第'+item.attributes.wishID+'个愿望'">
+				<text>{{item.attributes.content}}</text>
+			</uni-card>
+			
+			</u-swipe-action-item>
+			      </u-swipe-action>
+		<u-popup :round="10" :show="show" @close="close" @open="open" mode='center'>
+			<view class='popup'>
+				<view>
+					<text style='margin-top:70rpx; margin-bottom: -50rpx;' class='title'>许下你的愿望：</text>
+				</view>
+				<u--textarea class='text-input' v-model="newWish" placeholder="请输入内容"></u--textarea>
+				<u-button @click='add' style='margin-bottom: 30rpx;' class='btn' shape='circle' type='primary'>确定
+				</u-button>
+			</view>
+		</u-popup>
+	</view>
+	</uni-list>
+</template>
+
+<script>
+	// #ifdef MP-WEIXIN
+	const AV = require('@/libs/av-core-min.js');
+	const adapters = require('@/libs/leancloud-adapters-weapp.js');
+
+	AV.setAdapters(adapters);
+	AV.init({
+		appId: "zvCyWUCFP5gn8L8DeuMUph6x-gzGzoHsz",
+		appKey: "x4JFC5cdvO71mtJhyBGC2dkc",
+		serverURL: "https://flowerapi.mistletoe.top"
+	});
+	// #endif
+	// #ifndef MP-WEIXIN
+	const AV = require('leancloud-storage');
+	const {
+		Query,
+		User
+	} = AV;
+	// #endif
+	// #ifdef APP-PLUS
+	const dom = weex.requireModule('dom');
+	// #endif
+
+	export default {
+		methods: {
+			choose(e){
+				console.log(e)
+			},
+			open() {
+				this.show = true
+			},
+			close() {
+				this.show = false
+			},
+			add() {
+				const Todo = AV.Object.extend('wish');
+				const todo = new Todo();
+				todo.set('content', this.newWish);
+				
+				// 将对象保存到云端
+				todo.save().then((todo) => {
+				  
+				  const flower = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
+				  flower.set('count', this.title-5);
+				  flower.save()
+				  this.title=this.title-5
+				  
+				  console.log(`保存成功。objectId：${todo.id}`);
+				  this.close()
+				}, (error) => {
+				  // 异常处理
+				});
+			}
+		},
+		data() {
+			return {
+				title: '',
+				wishCount: '',
+				wishes: [],
+				show: false,
+				newWish: '',
+				options1:[{
+					text:"满足",
+					style: {
+					                            backgroundColor: '#2979ff',
+					                        }
+				},
+				{
+					text:"驳回",
+					style: {
+					                            backgroundColor: '#fa3534',
+					                        }
+				}]
+			}
+		},
+		onLoad() {
+			const query = new AV.Query('flower');
+			query.get('6277341f4fb5b8572d170463').then((todo) => {
+				this.title = todo.attributes.count
+			})
+
+			const wish = new AV.Query('wish');
+			wish.find().then((wishes) => {
+				this.wishes = wishes;
+				this.wishCount = wishes.length;
+			});
+		},
+	}
+</script>
+
+<style lang="scss" scoped>
+	.text-input {
+		width: 430rpx;
+		height: 30%;
+		margin-top: 100rpx;
+		margin-bottom: 20rpx;
+		display: flex;
+		justify-content: center;
+	}
+
+	.popup {
+		width: 300px;
+		height: 300px;
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+
+	.card {
+		width: 600rpx;
+	}
+
+	.btn {
+		width: 50%;
+		margin: 20rpx 0rpx 0rpx 0rpx;
+	}
+
+	.btns {
+
+		margin-top: 20px;
+		width: 50%;
+	}
+
+	.content {
+		display: flex;
+		flex-direction: column;
+		align-items: center;
+		justify-content: center;
+	}
+
+	.logo {
+		height: 300rpx;
+		width: 300rpx;
+		margin-top: 200rpx;
+		margin-left: auto;
+		margin-right: auto;
+		margin-bottom: 50rpx;
+	}
+
+	.text-area {
+		margin-top: 100rpx;
+		display: flex;
+		justify-content: center;
+	}
+
+	.title {
+		position: relative;
+		font-size: 45rpx;
+		color: #8f8f94;
+	}
+</style>

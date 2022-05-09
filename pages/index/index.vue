@@ -1,19 +1,29 @@
 <template>
+	<u-list>
+		
 	<view class="content">
+		<u-list-item>
 		<image class="logo" src="/static/flower.gif"></image>
 		<view class="text-area">
 			<text class="title">你现在有</text>
 			<text class="title">{{title}}</text>
 			<text class="title">朵小红花</text>
+			
+		</view>
+		</u-list-item>
+		<view style='margin-top: 50rpx;'>
+		<u-text type="success" :show='show' :text="text1+(wishCount+1)+text2">{{text1}}{{wishCount+1}}{{text2}}</u-text>
 		</view>
 		<view class='btns'>
 			<u-button @click='add' style='margin-top: 20rpx;' class='btn' shape='circle' type='primary'>加一朵！</u-button>
 			<view style='margin-top: 20rpx;'>
 			
 			<u-button @click='remove' class='btn' shape='circle' type='warning'>扣一朵！</u-button>
+			<u-button :disabled="open" @click='wish' class='btn' shape='circle' type='success'>进入愿望屋！</u-button>
 			</view>
 		</view>
 	</view>
+	</u-list>
 </template>
 
 <script>
@@ -39,6 +49,23 @@
 		data() {
 			return {
 				title: '',
+				open:true,
+				text1:"你已经集齐了五朵小红花，许下你的第",
+				text2:"个愿望吧！！",
+				wishCount:'',
+				show:false
+			}
+		},
+		watch:{
+			title(val){
+				if(val>=5){
+					this.open=false
+					this.show=true
+				}
+				else{
+					this.open=true
+					this.show=false
+				}
 			}
 		},
 		onLoad() {
@@ -46,6 +73,19 @@
 			query.get('6277341f4fb5b8572d170463').then((todo) => {
 				this.title=todo.attributes.count
 			})
+			
+			const wish = new AV.Query('wish');
+			wish.find().then((wishes) => {
+				this.wishCount=wishes.length;
+			});
+			if(this.title>=5){
+				this.open=false
+				this.show=true
+			}
+			else{
+				this.open=true
+				this.show=false
+			}
 		},
 		methods: {
 			add() {
@@ -63,12 +103,17 @@
 					//this.title--
 				});
 				this.title--
+			},
+			wish(){
+				uni.navigateTo({
+					url:'/pages/wish/wish'
+				})
 			}
 		}
 	}
 </script>
 
-<style scoped>
+<style>
 	.btn {
 		padding:0 0; 
 		margin: 20rpx 0rpx 0rpx 0rpx;
@@ -77,7 +122,7 @@
 
 	.btns {
 		
-		margin-top: 50px;
+		margin-top: 20px;
 		width: 50%;
 	}
 
