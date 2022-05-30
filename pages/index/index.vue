@@ -1,28 +1,33 @@
 <template>
 	<u-list>
-		
-	<view class="content">
-		<u-list-item>
-		<image class="logo" src="/static/flower.gif"></image>
-		<view class="text-area">
-			<text class="title">你现在有</text>
-			<text class="title">{{title}}</text>
-			<text class="title">朵小红花</text>
-			
-		</view>
-		</u-list-item>
-		<view style='margin-top: 50rpx;'>
-		<u-text type="success" :show='show' :text="text1+(wishCount+1)+text2">{{text1}}{{wishCount+1}}{{text2}}</u-text>
-		</view>
-		<view class='btns'>
-			<u-button @click='add' style='margin-top: 20rpx;' class='btn' shape='circle' type='primary'>加一朵！</u-button>
-			<view style='margin-top: 20rpx;'>
-			
-			<u-button @click='remove' class='btn' shape='circle' type='warning'>扣一朵！</u-button>
-			<u-button :disabled="open" @click='wish' class='btn' shape='circle' type='success'>进入愿望屋！</u-button>
+
+		<view class="content">
+			<u-list-item>
+				<image class="logo" src="/static/flower.gif"></image>
+				<view class="text-area">
+					<text class="title">你现在有</text>
+					<text class="title">{{title}}</text>
+					<text class="title">朵小红花</text>
+
+				</view>
+			</u-list-item>
+			<view style='margin-top: 50rpx;'>
+				<u-text type="success" :show='show' :text="text1+(wishCount+1)+text2">{{text1}}{{wishCount+1}}{{text2}}
+				</u-text>
+			</view>
+			<view class='btns'>
+				<u-button @click='add' style='margin-top: 20rpx;' class='btn' shape='circle' type='primary'>加一朵！
+				</u-button>
+				<view style='margin-top: 20rpx;'>
+
+					<u-button @click='remove' class='btn' shape='circle' type='warning'>扣一朵！</u-button>
+				</view>
+				<view style='margin-top: 20rpx;'>
+					<u-button :disabled="open" style='margin-top: 20rpx;' @click='wish' class='btn' shape='circle'
+						type='success'>进入愿望屋！</u-button>
+				</view>
 			</view>
 		</view>
-	</view>
 	</u-list>
 </template>
 
@@ -30,12 +35,12 @@
 	// #ifdef MP-WEIXIN
 	const AV = require('@/libs/av-core-min.js');
 	const adapters = require('@/libs/leancloud-adapters-weapp.js');
-	
+
 	AV.setAdapters(adapters);
 	AV.init({
-	  appId: "zvCyWUCFP5gn8L8DeuMUph6x-gzGzoHsz",
-	  appKey: "x4JFC5cdvO71mtJhyBGC2dkc",
-	  serverURL: "https://flowerapi.mistletoe.top"
+		appId: "zvCyWUCFP5gn8L8DeuMUph6x-gzGzoHsz",
+		appKey: "x4JFC5cdvO71mtJhyBGC2dkc",
+		serverURL: "https://flowerapi.mistletoe.top"
 	});
 	// #endif
 	// #ifndef MP-WEIXIN
@@ -49,64 +54,62 @@
 		data() {
 			return {
 				title: '',
-				open:true,
-				text1:"你已经集齐了五朵小红花，许下你的第",
-				text2:"个愿望吧！！",
-				wishCount:'',
-				show:false
+				open: true,
+				text1: "你已经集齐了五朵小红花，许下你的第",
+				text2: "个愿望吧！！",
+				wishCount: '',
+				show: false
 			}
 		},
-		watch:{
-			title(val){
-				if(val>=5){
-					this.open=false
-					this.show=true
-				}
-				else{
-					this.open=true
-					this.show=false
+		watch: {
+			title(val) {
+				if (val >= 5) {
+					this.open = false
+					this.show = true
+				} else {
+					this.open = true
+					this.show = false
 				}
 			}
 		},
 		onLoad() {
 			const query = new AV.Query('flower');
 			query.get('6277341f4fb5b8572d170463').then((todo) => {
-				this.title=todo.attributes.count
+				this.title = todo.attributes.count
 			})
-			
+
 			const wish = new AV.Query('wish');
 			wish.find().then((wishes) => {
-				this.wishCount=wishes.length;
+				this.wishCount = wishes.length;
 			});
-			if(this.title>=5){
-				this.open=false
-				this.show=true
-			}
-			else{
-				this.open=true
-				this.show=false
+			if (this.title >= 5) {
+				this.open = false
+				this.show = true
+			} else {
+				this.open = true
+				this.show = false
 			}
 		},
 		methods: {
 			add() {
 				const todo = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
-				todo.set('count', this.title+1);
-				todo.save().then((todo)=>{
+				todo.set('count', this.title + 1);
+				todo.save().then((todo) => {
 					//this.title--
 				});
 				this.title++
 			},
 			remove() {
 				const todo = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
-				todo.set('count', this.title-1);
-				todo.save().then((todo)=>{
+				todo.set('count', this.title - 1);
+				todo.save().then((todo) => {
 					//this.title--
 				});
 				this.title--
 			},
-			wish(){
+			wish() {
 				uni.navigateTo({
-					url:'/pages/wish/wish'
+					url: '/pages/wish/wish'
 				})
 			}
 		}
@@ -115,13 +118,13 @@
 
 <style>
 	.btn {
-		padding:0 0; 
+		padding: 0 0;
 		margin: 20rpx 0rpx 0rpx 0rpx;
 		margin-top: 20rpx;
 	}
 
 	.btns {
-		
+
 		margin-top: 20px;
 		width: 50%;
 	}

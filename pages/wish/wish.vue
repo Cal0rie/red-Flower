@@ -5,32 +5,37 @@
 			<text class="title">许个愿望吧！！</text>
 			<text class="title">你现在有{{title}}朵小红花</text>
 		</view>
-		<u-button @click='open' style='margin-top: 50rpx;' class='btn' shape='circle' type='primary'>许个愿</u-button>
+		<view>
+		<u-button @click='open' style='width:400rpx' class='btn' shape='circle' type='primary'>许个愿</u-button>
+		</view>
+		<view v-for="(item, index) in wishes" :key='index'>
 			<u-swipe-action style='margin-top: 20rpx;'>
-			        <u-swipe-action-item
-			          :options="options1"
-						v-for="(item, index) in wishes" :key='index'
-						@click=choose(index)
-			        >
-					
-			<uni-card class='card' :title="'第'+item.attributes.wishID+'个愿望'">
-				<text>{{item.attributes.content}}</text>
+			        <u-swipe-action-item :options="options1" @click=choose(index)>
+			<uni-card class='card' :title="'第'+item.wishID+'个愿望'">
+				<text>{{item.content}}</text>
 			</uni-card>
 			
 			</u-swipe-action-item>
 			      </u-swipe-action>
-		<u-popup :round="10" :show="show" @close="close" @open="open" mode='center'>
-			<view class='popup'>
-				<view>
-					<text style='margin-top:70rpx; margin-bottom: -50rpx;' class='title'>许下你的愿望：</text>
-				</view>
-				<u--textarea class='text-input' v-model="newWish" placeholder="请输入内容"></u--textarea>
-				<u-button @click='add' style='margin-bottom: 30rpx;' class='btn' shape='circle' type='primary'>确定
-				</u-button>
+				  </view>
+		
+	</view>  
+	<u-popup :round="10" :show="show" @close="close" @open="open" mode='center'>
+		<view class='popup'>
+			<view class='title'>
+				<text style='margin-top:70rpx; margin-bottom: -50rpx;' class='title'>许下你的愿望：</text>
 			</view>
-		</u-popup>
-	</view>
+			<view class='text-input'>
+			<u-textarea style='width=80%' class='text-input' v-model="newWish" placeholder="请输入内容"></u-textarea>
+			</view>
+			<view>
+			<u-button @click='add' style='margin-bottom: 20rpx;' class='btn' shape='circle' type='primary'>确定
+			</u-button>
+			</view>
+		</view>
+	</u-popup>
 	</uni-list>
+	
 </template>
 
 <script>
@@ -108,7 +113,7 @@
 				}]
 			}
 		},
-		onLoad() {
+		beforeCreate() {
 			const query = new AV.Query('flower');
 			query.get('6277341f4fb5b8572d170463').then((todo) => {
 				this.title = todo.attributes.count
@@ -117,6 +122,7 @@
 			const wish = new AV.Query('wish');
 			wish.find().then((wishes) => {
 				this.wishes = wishes;
+				console.log(this.wishes[0].attributes.wishID)
 				this.wishCount = wishes.length;
 			});
 		},
@@ -127,16 +133,17 @@
 	.text-input {
 		width: 430rpx;
 		height: 30%;
-		margin-top: 100rpx;
+		margin-top: 50rpx;
 		margin-bottom: 20rpx;
 		display: flex;
 		justify-content: center;
 	}
 
 	.popup {
-		width: 300px;
 		height: 300px;
+		width: 300px;
 		display: flex;
+		flex-direction: column;
 		justify-content: center;
 		align-items: center;
 	}
@@ -146,14 +153,8 @@
 	}
 
 	.btn {
-		width: 50%;
-		margin: 20rpx 0rpx 0rpx 0rpx;
-	}
-
-	.btns {
-
-		margin-top: 20px;
-		width: 50%;
+		width: 300px;
+		margin-bottom: 20px;
 	}
 
 	.content {
@@ -173,7 +174,8 @@
 	}
 
 	.text-area {
-		margin-top: 100rpx;
+		margin-top: 30px;
+		margin-bottom: 10px;
 		display: flex;
 		justify-content: center;
 	}
