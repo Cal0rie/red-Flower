@@ -2,11 +2,10 @@
 	<uni-list>
 		<view class="content">
 			<view class="text-area">
-				<text class="title">许个愿望吧！！</text>
 				<text class="title">你现在有{{title}}朵小红花</text>
 			</view>
 			<view>
-				<button @click='open' class='btn' shape='circle' type='primary'>许个愿</button>
+				<button @click='open' :disabled="canWish" class='btn' shape='circle' type='primary'>许个愿</button>
 			</view>
 			
 			<view class='cards' v-for="(item, index) in wishes" :key='id'>
@@ -36,6 +35,7 @@
 				</view>
 			</view>
 		</u-popup>
+		<u-loading-page :loading='load'></u-loading-page>
 	</uni-list>
 
 </template>
@@ -66,6 +66,8 @@
 	export default {
 		data() {
 			return {
+				canWish: false,
+				load: true,
 				title: '',
 				wishCount: '',
 				wishes: [],
@@ -90,6 +92,13 @@
 			const query = new AV.Query('flower');
 			query.get('6277341f4fb5b8572d170463').then((todo) => {
 				this.title = todo.attributes.count
+				if(this.title>=5){
+					this.canWish = false
+				}
+				else {
+					this.canWish = true
+				}
+				this.load=false
 			})
 
 			const wish = new AV.Query('wish');

@@ -12,7 +12,7 @@
 				</view>
 			</u-list-item>
 			<view style='margin-top: 50rpx;'>
-				<u-text type="success" :show='show' :text="text1+(wishCount+1)+text2">{{text1}}{{wishCount+1}}{{text2}}
+				<u-text type="success" :show='show' :text="text1+(wishCount)+text2">{{text1}}{{wishCount}}{{text2}}
 				</u-text>
 				<u-text type="success" :show='ifWish' text="叮叮,你有愿望待处理">
 				</u-text>
@@ -136,7 +136,7 @@
 				this.title--
 			},
 			wish() {
-				uni.navigateTo({
+				uni.redirectTo({
 					url: '/pages/wish/wish'
 				})
 			}
