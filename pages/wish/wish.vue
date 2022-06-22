@@ -1,41 +1,43 @@
 <template>
 	<uni-list>
-	<view class="content">
-		<view class="text-area">
-			<text class="title">许个愿望吧！！</text>
-			<text class="title">你现在有{{title}}朵小红花</text>
-		</view>
-		<view>
-		<u-button @click='open' style='width:400rpx' class='btn' shape='circle' type='primary'>许个愿</u-button>
-		</view>
-		<view v-for="(item, index) in wishes" :key='index'>
-			<u-swipe-action style='margin-top: 20rpx;'>
-			        <u-swipe-action-item :options="options1" @click=choose(index)>
-			<uni-card class='card' :title="'第'+item.wishID+'个愿望'">
-				<text>{{item.content}}</text>
-			</uni-card>
-			
-			</u-swipe-action-item>
-			      </u-swipe-action>
-				  </view>
-		
-	</view>  
-	<u-popup :round="10" :show="show" @close="close" @open="open" mode='center'>
-		<view class='popup'>
-			<view class='title'>
-				<text style='margin-top:70rpx; margin-bottom: -50rpx;' class='title'>许下你的愿望：</text>
-			</view>
-			<view class='text-input'>
-			<u-textarea style='width=80%' class='text-input' v-model="newWish" placeholder="请输入内容"></u-textarea>
+		<view class="content">
+			<view class="text-area">
+				<text class="title">许个愿望吧！！</text>
+				<text class="title">你现在有{{title}}朵小红花</text>
 			</view>
 			<view>
-			<u-button @click='add' style='margin-bottom: 20rpx;' class='btn' shape='circle' type='primary'>确定
-			</u-button>
+				<button @click='open' class='btn' shape='circle' type='primary'>许个愿</button>
 			</view>
+			
+			<view class='cards' v-for="(item, index) in wishes" :key='id'>
+				<uni-swipe-action>
+				<uni-swipe-action-item class='card' style="width: 600rpx" :right-options="options1" @click="choose($event, index)">
+						<uni-card :title="'第'+item.wishID+'个愿望'">
+							<text>{{item.content}}</text>
+							<view style='margin-top: 20rpx;'>{{item.condition}}</view>
+						</uni-card>
+					</uni-swipe-action-item>
+				</uni-swipe-action>
+			</view>
+			
+
 		</view>
-	</u-popup>
+		<u-popup :round="10" :show="show" @close="close" @open="open" mode='center'>
+			<view class='popup'>
+				<view class='title'>
+					<text style='margin-top:70rpx; margin-bottom: -50rpx;' class='title'>许下你的愿望：</text>
+				</view>
+				<view class='text-input'>
+					<u-textarea style='width=80%' class='text-input' v-model="newWish" placeholder="请输入内容"></u-textarea>
+				</view>
+				<view>
+					<u-button @click='add' style='margin-bottom: 20rpx;' class='btn' shape='circle' type='primary'>确定
+					</u-button>
+				</view>
+			</view>
+		</u-popup>
 	</uni-list>
-	
+
 </template>
 
 <script>
@@ -62,36 +64,6 @@
 	// #endif
 
 	export default {
-		methods: {
-			choose(e){
-				console.log(e)
-			},
-			open() {
-				this.show = true
-			},
-			close() {
-				this.show = false
-			},
-			add() {
-				const Todo = AV.Object.extend('wish');
-				const todo = new Todo();
-				todo.set('content', this.newWish);
-				
-				// 将对象保存到云端
-				todo.save().then((todo) => {
-				  
-				  const flower = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
-				  flower.set('count', this.title-5);
-				  flower.save()
-				  this.title=this.title-5
-				  
-				  console.log(`保存成功。objectId：${todo.id}`);
-				  this.close()
-				}, (error) => {
-				  // 异常处理
-				});
-			}
-		},
 		data() {
 			return {
 				title: '',
@@ -99,18 +71,19 @@
 				wishes: [],
 				show: false,
 				newWish: '',
-				options1:[{
-					text:"满足",
-					style: {
-					                            backgroundColor: '#2979ff',
-					                        }
-				},
-				{
-					text:"驳回",
-					style: {
-					                            backgroundColor: '#fa3534',
-					                        }
-				}]
+				options1: [{
+						text: "满足",
+						style: {
+							backgroundColor: '#2979ff',
+						}
+					},
+					{
+						text: "驳回",
+						style: {
+							backgroundColor: '#fa3534',
+						}
+					}
+				]
 			}
 		},
 		beforeCreate() {
@@ -122,14 +95,66 @@
 			const wish = new AV.Query('wish');
 			wish.find().then((wishes) => {
 				this.wishes = wishes;
+				console.log(this.wishes)
 				console.log(this.wishes[0].attributes.wishID)
 				this.wishCount = wishes.length;
 			});
+		},
+		methods: {
+			choose(e,index) {
+				console.log(e)
+				console.log(index)
+				if(e.index==0){		//满足操作
+					const todo = AV.Object.createWithoutData('wish', this.wishes[index].id);
+					todo.set('condition', '满足');
+					todo.save().then((res)=>{
+						this.wishes[index].attributes.condition="满足"
+					});
+				}
+				else if(e.index==1){		//驳回操作
+					const todo = AV.Object.createWithoutData('wish', this.wishes[index].id);
+					todo.set('condition', '驳回');
+					todo.save().then((res)=>{
+						this.wishes[index].attributes.condition="驳回"
+					});
+				}
+			},
+			open() {
+				this.show = true
+			},
+			close() {
+				this.show = false
+			},
+			add() {
+				const Todo = AV.Object.extend('wish');
+				const todo = new Todo();
+				todo.set('content', this.newWish);
+		
+				// 将对象保存到云端
+				todo.save().then((todo) => {
+		
+					const flower = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
+					flower.set('count', this.title - 5);
+					flower.save()
+					this.title = this.title - 5
+		
+					console.log(`保存成功。objectId：${todo.id}`);
+					
+					this.wishes.push({content: this.newWish,wishID: this.wishes.length})
+					
+					this.close()
+				}, (error) => {
+					// 异常处理
+				});
+			}
 		},
 	}
 </script>
 
 <style lang="scss" scoped>
+	.cards{
+		width: 700rpx;
+	}
 	.text-input {
 		width: 430rpx;
 		height: 30%;
@@ -148,13 +173,9 @@
 		align-items: center;
 	}
 
-	.card {
-		width: 600rpx;
-	}
-
 	.btn {
-		width: 300px;
-		margin-bottom: 20px;
+		width: 250rpx;
+		margin-bottom: 10px;
 	}
 
 	.content {

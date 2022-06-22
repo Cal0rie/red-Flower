@@ -2,6 +2,8 @@ import App from './App'
 
 // #ifndef VUE3
 import Vue from 'vue'
+
+
 Vue.config.productionTip = false
 App.mpType = 'app'
 const app = new Vue({
@@ -24,7 +26,6 @@ export function createApp() {
 
 import uView from '@/uni_modules/uview-ui'
 Vue.use(uView)
-
 // #ifndef MP-WEIXIN
 const AV = require('leancloud-storage');
 const {

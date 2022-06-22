@@ -14,6 +14,8 @@
 			<view style='margin-top: 50rpx;'>
 				<u-text type="success" :show='show' :text="text1+(wishCount+1)+text2">{{text1}}{{wishCount+1}}{{text2}}
 				</u-text>
+				<u-text type="success" :show='ifWish' text="叮叮,你有愿望待处理">
+				</u-text>
 			</view>
 			<view class='btns'>
 				<u-button @click='add' style='margin-top: 20rpx;' class='btn' shape='circle' type='primary'>加一朵！
@@ -28,6 +30,7 @@
 				</view>
 			</view>
 		</view>
+		<u-loading-page :loading='load'></u-loading-page>
 	</u-list>
 </template>
 
@@ -58,7 +61,9 @@
 				text1: "你已经集齐了五朵小红花，许下你的第",
 				text2: "个愿望吧！！",
 				wishCount: '',
-				show: false
+				show: false,
+				ifWish: true,
+				load: true
 			}
 		},
 		watch: {
@@ -66,13 +71,18 @@
 				if (val >= 5) {
 					this.open = false
 					this.show = true
-				} else {
+				} 
+				else if(this.ifWish==true)
+				{
+					this.open= false
+				}
+				else {
 					this.open = true
 					this.show = false
 				}
 			}
 		},
-		onLoad() {
+		beforeMount() {
 			const query = new AV.Query('flower');
 			query.get('6277341f4fb5b8572d170463').then((todo) => {
 				this.title = todo.attributes.count
@@ -82,13 +92,31 @@
 			wish.find().then((wishes) => {
 				this.wishCount = wishes.length;
 			});
-			if (this.title >= 5) {
-				this.open = false
-				this.show = true
-			} else {
-				this.open = true
-				this.show = false
-			}
+			const q1 = new AV.Query('wish');
+			q1.equalTo('condition', '未处理');
+			q1.find().then((res) => {
+				console.log(res)
+				if(res.length){
+					this.ifWish=true
+				}
+				else
+				{
+					this.ifWish=false
+				}
+				if (this.title >= 5) {
+					this.open = false
+					this.show = true
+				} 
+				else if(this.ifWish==true)
+				{
+					this.open = false
+				}
+				else {
+					this.open = true
+					this.show = false
+				}
+				this.load=false
+			});
 		},
 		methods: {
 			add() {
