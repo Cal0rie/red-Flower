@@ -26,7 +26,7 @@
 				</view>
 				<view style='margin-top: 20rpx;'>
 					<u-button :disabled="open" style='margin-top: 20rpx;' @click='wish' class='btn' shape='circle'
-						type='success'>进入愿望屋！</u-button>
+						type='success'>进入愿望屋！</u-button>		<!-- 测试时把“open”临时修改为"false" -->
 				</view>
 			</view>
 		</view>
@@ -126,6 +126,12 @@
 					//this.title--
 				});
 				this.title++
+				
+				//写一条记录
+				const Log = AV.Object.extend('log');
+				const log = new Log();
+				log.set('operate', "add");
+				log.save().then((todo) => {})
 			},
 			remove() {
 				const todo = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
@@ -134,6 +140,12 @@
 					//this.title--
 				});
 				this.title--
+				
+				//写一条记录
+				const Log = AV.Object.extend('log');
+				const log = new Log();
+				log.set('operate', "remove");
+				log.save().then((todo) => {})
 			},
 			wish() {
 				uni.redirectTo({
