@@ -128,10 +128,16 @@
 				this.title++
 				
 				//写一条记录
-				const Log = AV.Object.extend('log');
-				const log = new Log();
-				log.set('operate', "add");
-				log.save().then((todo) => {})
+				AV.Cloud.run("writeLog", {
+					operate: "add"
+				}).then(
+				  function (data) {
+				    // 处理结果
+				  },
+				  function (err) {
+				    // 处理报错
+				  }
+				);
 			},
 			remove() {
 				const todo = AV.Object.createWithoutData('flower', '6277341f4fb5b8572d170463');
@@ -142,10 +148,9 @@
 				this.title--
 				
 				//写一条记录
-				const Log = AV.Object.extend('log');
-				const log = new Log();
-				log.set('operate', "remove");
-				log.save().then((todo) => {})
+				AV.Cloud.run("writeLog", {
+					operate: "remove"
+				})
 			},
 			wish() {
 				uni.redirectTo({
